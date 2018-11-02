@@ -1,0 +1,288 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+    <h:head>
+        <title>Studio55 - Federated Test Service</title>
+        <link rel="icon" href="/images/s55.png" type="image/x-icon"/>
+        <p:ajaxExceptionHandler type="javax.faces.application.ViewExpiredException" onexception="alert('Page Expired, Reloading...!'); location.reload(true);" />
+    </h:head>
+    <h:body>
+        <center>
+            <p:panel header="Select Test" style="width: 99%;height: 70%" >
+
+                <h:form id="submittestform">
+
+                    <h:panelGrid  columns="2" style="margin-bottom:10px;border:1px;" cellpadding="5" cellspacing="2">
+                        <p:outputLabel for="runningfor" value="Running For : " />
+                        <p:selectOneRadio id="runningfor" value="#{testControllerBean.runningfor}" required="true"  >
+                            <p:ajax listener="#{testControllerBean.updateRunngingFor}" update="submittestform myaccord" />
+                            <f:selectItem itemLabel="Certification Test" itemValue="certification" />
+                            <f:selectItem itemLabel="Validation Test" itemValue="validation" />                           
+                        </p:selectOneRadio>
+                        <p:outputLabel for="selectapplication" value="Application :"/>
+                        <p:selectOneMenu id="selectapplication" style="width: 80%;width:170px;" value="${testControllerBean.selectedApplication}" >    
+                            <p:ajax listener="#{testControllerBean.updateTestTypeDropDown}" update="submittestform" partialSubmit="true" onstart="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" />
+                            <f:selectItem  itemLabel="Select Application" noSelectionOption="true"/>         
+                            <f:selectItems value="${testControllerBean.applicationList}"/>
+                        </p:selectOneMenu>
+                        <p:outputLabel for="selecttesttype" value="Test Type :"/>
+                        <p:selectOneMenu id="selecttesttype" style="width: 80%;width:170px;" value="${testControllerBean.selectedTestType}" >    
+                            <p:ajax listener="#{testControllerBean.updateScenarioList}" update="submittestform" partialSubmit="true" onstart="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" />
+                            <f:selectItem  itemLabel="Select Test type" noSelectionOption="true"/>         
+                            <f:selectItems value="${testControllerBean.testTypeList}"/>
+                        </p:selectOneMenu>
+                        <p:outputLabel for="selectscenario" value="Scenario/Test Name :"/>
+                        <p:selectOneMenu id="selectscenario" style="width: 80%;width:170px;" value="${testControllerBean.selectedScenario}" >    
+                            <p:ajax listener="#{testControllerBean.updatBaselineDates}" update="submittestform myaccord" partialSubmit="true" onstart="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" />
+                            <f:selectItem  itemLabel="Select Test/Scenario" noSelectionOption="true"/>         
+                            <f:selectItems value="${testControllerBean.scenarioList}"/>
+                        </p:selectOneMenu>
+                        <p:outputLabel for="selectbaselinedate" value="Compare Results With :"/>
+                        <p:selectOneMenu id="selectbaselinedate" style="width: 80%;width:170px;" value="#{testControllerBean.selectedBaselineDate}" disabled="#{testControllerBean.disableSelectedBaselineDate}">    
+                            <p:ajax listener="#{testControllerBean.updateTestInformation}" update="submittestform myaccord" partialSubmit="true" onstart="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" />
+                            <f:selectItem  itemLabel="Select Baseline" noSelectionOption="true"/>         
+                            <f:selectItems value="${testControllerBean.baselineDateList.entrySet()}" var="shortname" itemValue="#{shortname.key}" itemLabel="#{shortname.value}"/>
+                        </p:selectOneMenu>
+                        <p:outputLabel for="testshortname" value="Short Description :"/>
+                        <h:inputText id="testshortname" value="${testControllerBean.shortnameForTest}" maxlength="50" size="25" >
+                            <p:ajax listener="${testControllerBean.updateShortNameForTest}"/>
+                        </h:inputText>
+                    </h:panelGrid>    
+
+                    <br/>
+                    <br/>
+                    <br/>                    
+                    <p:panelGrid columns="5" style="float:right;" styleClass="ui-noborder">
+                        <p:commandLink id="startBtn" type="button" rendered="true"  title="Click to Start the seleted test" disabled="#{testControllerBean.disableStartBtn}" async="true" >
+                            <p:ajax listener="#{testControllerBean.startTest}" update="submittestform" partialSubmit="true" />
+                            <p:graphicImage value="/images/start.png" />
+                        </p:commandLink>
+                        <h:outputText value="&nbsp;&nbsp;&nbsp;&nbsp;"/>
+                        <p:commandLink id="stopBtn" type="button" rendered="true" title="Click to Stop the seleted test" disabled="#{testControllerBean.disableStopBtn}" async="true" >
+                            <p:ajax listener="#{testControllerBean.stopTest}" update="submittestform" partialSubmit="true" onstart="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()"/>
+                            <p:graphicImage value="/images/stop.png"  />
+                        </p:commandLink>
+                        <h:outputText value="&nbsp;&nbsp;&nbsp;&nbsp;"/>
+                    </p:panelGrid>
+                    <p:dialog id="authenticatestopdialog" header="Stop Test - Authentication" widgetVar="authenticatestopdialog" modal="true" width="35%" height="50%" style="left: 83px; top: 365.5px;" resizable="false">
+                        <center>
+                            <h:panelGrid columns="4" >
+                                <p:watermark for="secretkeystopddialog" value="Authorization Key"   />
+                                <h:inputSecret id="secretkeystopddialog" value="#{testControllerBean.secretkeystopddialog}" title="Authorization Key" label="Authorization Key" style="color:blue;">
+                                    <p:ajax listener="#{testControllerBean.updatesecretkeyforstop}"/>
+                                </h:inputSecret>
+                                <p:commandButton value=" Stop Test " >
+                                    <p:ajax listener="#{testControllerBean.submitStopTest}" update="submittestform" onstart="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()"/>
+                                </p:commandButton>        
+                            </h:panelGrid>
+                            <p:growl id="messages" showDetail="true" life="6000">
+                                <p:autoUpdate />
+                            </p:growl>
+                        </center>
+                    </p:dialog>
+                    <p:dialog id="starttestauthenticationdialog" header="Start Test - Confirm" widgetVar="starttestauthenticationdialog" modal="true" width="35%" height="50%" style="left: 83px; top: 365.5px;" resizable="false">
+                        <center>
+                            <h:panelGrid columns="6" >
+                                <p:watermark for="useremail" value="Your Email Address" />
+                                <h:inputText id="useremail" label="Your Email Address" value="#{testControllerBean.userEmail}" title="Your Email Address" style="color:blue;" autocomplete="true"/>
+                                <p:watermark for="secretkey" value="Authorization Key"   />
+                                <h:inputSecret id="secretkey" value="#{testControllerBean.userAuthKey}" title="Authorization Key" label="Authorization Key" style="color:blue;" />
+                                <p:commandButton value="Submit" id="submitauthkey" actionListener="#{testControllerBean.submitTest}" update="submittestform showteststatusdialog pollerControl" onstart="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()"/>        
+
+                            </h:panelGrid>
+                        </center>
+                    </p:dialog>
+                    <p:dialog id="testinprogressdialog" header="Test In-Progress" widgetVar="testinprogressdialog" modal="true" width="40%" height="50%" style="left: 83px; top: 365.5px;" resizable="false">
+                        <center>
+                            <h:outputText value="Test is already In-Progress for '#{testControllerBean.selectedApplication}', Would you like to show the Status? "/>
+                            <br/><br/><br/><br/>
+                            <p:commandButton value="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;No&nbsp;&nbsp;&nbsp;&nbsp;" oncomplete="PF('testinprogressdialog').hide();" />
+                            <h:outputText value="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"/>
+                            <p:commandButton value="&nbsp;&nbsp;&nbsp;&nbsp;Yes&nbsp;&nbsp;&nbsp;" oncomplete="PF('testinprogressdialog').hide();PF('authenticatestatusdialog').show();" />
+                            <br/><br/>
+                        </center>
+                    </p:dialog>
+                    <p:dialog id="authenticatestatusdialog" header="Show Status - Authentication" widgetVar="authenticatestatusdialog" modal="true" width="35%" height="50%" style="left: 83px; top: 365.5px;" resizable="false">
+                        <center>
+                            <h:panelGrid columns="4" >
+                                <p:watermark for="secretkeystatusddialog" value="Authorization Key"   />
+                                <h:inputSecret id="secretkeystatusddialog" value="#{testControllerBean.secretkeystatusddialog}" title="Authorization Key" label="Authorization Key" style="color:blue;" >
+                                    <p:ajax listener="#{testControllerBean.updatesecretkeyforstatus}"/>
+                                </h:inputSecret>
+                                <p:commandButton value="View Status" >
+                                    <p:ajax listener="#{testControllerBean.validateShowTestStatus}" update="submittestform showteststatusdialog" onstart="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()"/>
+                                </p:commandButton>        
+                            </h:panelGrid>
+                        </center>
+                    </p:dialog>
+                    <p:dialog id="invalidauthrizationkeystarttest" header="Invalid Authorization Key/Mail" widgetVar="invalidauthrizationkeystarttest" modal="true" width="35%" height="50%" style="left: 83px; top: 365.5px;" resizable="false" closable="false">
+                        <center>
+                            <h:outputText value="Invalid Email/Authorization Key!"/>
+                            <br/>
+                            <p:commandButton value="OK" oncomplete="PF('starttestauthenticationdialog').show();PF('invalidauthrizationkeystarttest').hide();"/>
+                        </center>
+                    </p:dialog>
+                    <p:dialog id="invalidauthrizationkey" header="Invalid Authorization Key" widgetVar="invalidauthrizationkey" modal="true" width="35%" height="50%" style="left: 83px; top: 365.5px;" resizable="false" closable="false">
+                        <center>
+                            <h:outputText value="Invalid Authorization Key1!"/>
+                            <br/>
+                            <p:commandButton value="OK" oncomplete="PF('authenticatestatusdialog').show();PF('invalidauthrizationkey').hide();"/>
+                        </center>
+                    </p:dialog>
+                    <p:dialog id="invalidauthrizationkeystoptest" header="Invalid Authorization Key" widgetVar="invalidauthrizationkeystoptest" modal="true" width="35%" height="50%" style="left: 83px; top: 365.5px;" resizable="false" closable="false">
+                        <center>
+                            <h:outputText value="Invalid Authorization Key!"/>
+                            <br/>
+                            <p:commandButton value="OK" oncomplete="PF('invalidauthrizationkeystoptest').hide();PF('authenticatestopdialog').show();"/>
+                        </center>
+                    </p:dialog>
+                    <p:dialog id="tesaborteddialog" header="Test Aborted" widgetVar="tesaborteddialog" modal="true" width="35%" height="50%" style="left: 83px; top: 365.5px;" resizable="false" closable="false">
+                        <center>
+                            <h:outputText value="Test has been aborted!"/>
+                            <br/>
+                            <p:commandButton value="OK" oncomplete="PF('tesaborteddialog').hide();location.reload(true);"/>
+                        </center>
+                    </p:dialog>                    
+                    <p:dialog id="showteststatusdialog" widgetVar="showteststatusdialog" modal="true" draggable="false" closable="false" resizable="false" showHeader="false"  >
+                        <p:panel header="Test In-Progress" style="width: 100%;height: 100%" >
+                            <h:panelGrid columns="2" cellpadding="5" cellspacing="5">
+                                <p:outputLabel for="selectedapplication_status" value="Application : " style="font-weight: bold"/>
+                                <h:outputText value="#{testControllerBean.selectedApplication_status}" id="selectedapplication_status"/>
+                                <p:outputLabel for="selectedTestType_status" value="Test Type : " style="font-weight: bold"/>
+                                <h:outputText value="#{testControllerBean.selectedTestType_status}" id="selectedTestType_status"/>
+                                <p:outputLabel for="selectedScenarioName_status" value="Scenarioname : " style="font-weight: bold"/>
+                                <h:outputText value="#{testControllerBean.selectedScenarioName_status}" id="selectedScenarioName_status"/>
+                                <p:outputLabel for="testSubmittedTime_status" value="Test Submitted Time : " style="font-weight: bold"/>
+                                <h:outputText value="#{testControllerBean.testSubmittedTime_status}" id="testSubmittedTime_status"/>
+                                <p:outputLabel for="testStarttime_status" value="Test Start Time : " style="font-weight: bold"/>
+                                <h:outputText value="#{testControllerBean.testStarttime_status} " id="testStarttime_status"/>
+                                <p:outputLabel for="testEndTime_status" value="Test End Time(~) : " style="font-weight: bold"/>
+                                <h:outputText value="#{testControllerBean.testEndTime_status} " id="testEndTime_status"/>
+                                <p:outputLabel for="testConfluencepath_status" value="Confluence Path : " style="font-weight: bold"/>
+                                <h:outputLink value="#{testControllerBean.testConfluencepath_status}" id="testConfluencepath_status" target="_blank"> <h:outputText value="Click Here"/></h:outputLink>
+                                <p:outputLabel for="testTriggerBy_status" value="Trigger By : " style="font-weight: bold"/>
+                                <h:outputText value="#{testControllerBean.testTriggerBy_status}" id="testTriggerBy_status"/>                                
+                            </h:panelGrid>     
+                            <br/>
+                            <p:progressBar id="statusprogressbar" value="#{testControllerBean.testETA_status}" ajax="true" labelTemplate="#{testControllerBean.testETA_status}%"  styleClass="animated" global="false"  />
+                            <p:poll id="pollerControl" interval="5" listener="#{testControllerBean.getRunningScenarioStatus}" update="statusprogressbar testEndTime_status testStarttime_status statusstopbtn " stop="#{testControllerBean.isTestPollingStopped}"/>
+                            <br/>
+                            <br/>
+                            <p:commandButton id="statusstopbtn" value="&nbsp;&nbsp;&nbsp;Stop&nbsp;&nbsp;&nbsp;" onclick="PF('authenticatestopdialog').show();" disabled="#{testControllerBean.statusDialogStopStatus}">
+
+                            </p:commandButton>
+                            <h:outputText value="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"/>
+                            <p:commandButton value="&nbsp;Refresh&nbsp;">
+                                <p:ajax listener="#{testControllerBean.getRunningScenarioStatus}" update="statusprogressbar testEndTime_status testStarttime_status statusstopbtn pollerControl"/>
+                            </p:commandButton>
+
+                            <h:outputText value="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"/>
+                            <p:commandButton value="&nbsp;Close&nbsp;" onclick="PF('showteststatusdialog').hide(); location.reload(true);">
+                                <p:ajax listener="#{testControllerBean.stoppollingStatus}" onstart="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()"/>
+                            </p:commandButton>
+
+                        </p:panel>
+                    </p:dialog>
+                    <p:watermark for="testshortname" value="e.g.:Certification Test : 13-Nov-2020" />                    
+                </h:form>
+
+                <br/>
+                <br/>
+                <br/>
+                <br/>
+            </p:panel>
+
+        </center>
+        <p:accordionPanel id="myaccord" activeIndex="#{testControllerBean.seletedAccordIndex}"  style="width:100%; border:1px;">
+            <p:tab id="basicinformationtab" title="Basic Information " closable="true" rendered="true" >
+                <p:panel>
+                    <h:panelGrid columns="2" style="margin-bottom:10px;border:1px;" cellpadding="5" cellspacing="2">
+                        <p:outputLabel for="scenarioname" value="Scenario Name : " style="font-weight: bold"/>
+                        <h:outputText id="scenarioname" value="${testControllerBean.scenarioname}"/>
+
+                        <p:outputLabel for="concurrentusers" value="Concurrent Users : " style="font-weight: bold"/>
+                        <h:outputText id="concurrentusers" value="${testControllerBean.concurrentusers}"/>
+
+                        <p:outputLabel for="avgtestduration" value="Avg. Test Duration : " style="font-weight: bold"/>
+                        <h:outputText id="avgtestduration" value="${testControllerBean.avgtestduration}"/>
+
+                        <p:outputLabel for="recentbaselinedate" value="Recent Baseline Date : " style="font-weight: bold"/>
+                        <h:outputText id="recentbaselinedate" value="${testControllerBean.recentbaselinedate}"/>
+
+                        <p:outputLabel for="baselineconfluencepage" value="Baseline Results Page : " style="font-weight: bold"/>
+                        <h:outputLink value="${testControllerBean.baselineconfluencepage}" id="baselineconfluencepage" target="_blank"> <h:outputText value="Click Here"/></h:outputLink>
+
+                        <p:outputLabel for="recentresultspage" value="Recent Results Page : " style="font-weight: bold"/>
+                        <h:outputLink value="${testControllerBean.recentresultspage}" id="recentresultspage" target="_blank"> <h:outputText value="Click Here"/></h:outputLink>
+
+
+                        <p:outputLabel for="testdescription" value="Test Description : " style="font-weight: bold"/>
+                        <h:outputText id="testdescription" value="${testControllerBean.testdescription}"/>
+                    </h:panelGrid>  
+                </p:panel>
+            </p:tab>
+
+            <p:tab id="additionalinformationtab" title="Selected Test Details " closable="true" rendered="true" >
+                <p:panel>
+                    <h:panelGrid columns="2" style="margin-bottom:10px;border:1px;" cellpadding="5" cellspacing="2">
+                        <p:outputLabel for="teststartby" value="Test Initiated by : " style="font-weight: bold"/>
+                        <h:outputText id="teststartby" value="${testControllerBean.teststartby}"/>
+
+                        <p:outputLabel for="teststatus" value="Test Status : " style="font-weight: bold"/>
+                        <h:outputText id="teststatus" value="${testControllerBean.teststatus}"/>
+
+                        <p:outputLabel for="concurrentusersdet" value="Concurrent Users : " style="font-weight: bold"/>
+                        <h:outputText id="concurrentusersdet" value="${testControllerBean.concurrentusersdet}"/>
+
+                        <p:outputLabel for="testperiod" value="Test Period : " style="font-weight: bold"/>
+                        <h:outputText id="testperiod" value="${testControllerBean.testperiod}"/>
+
+                        <p:outputLabel for="testduration" value="Test Duration : " style="font-weight: bold"/>
+                        <h:outputText id="testduration" value="${testControllerBean.testduration}"/>
+                    </h:panelGrid>
+                </p:panel>
+            </p:tab>
+            <p:tab id="responsetimestab" title="Selected Test Responsetimes Summary " closable="true" rendered="true" >
+                <center>
+                    <p:panel style="width: 90%;height: 100%" >
+                        <p:dataTable id="viewtestData"  value="#{testControllerBean.transDataList}" var="p" scrollWidth="100%" resizableColumns="true" paginator="true" rows="10">
+                            <p:column headerText="Transaction Name" width="50%" sortBy="#{p.transactionName}">
+                                <div align="left"><h:outputText value="#{p.transactionName}" /></div>
+                            </p:column>
+                            <p:column headerText="Mininum" width="10%" sortBy="#{p.respmin}">
+                                <div align="center"><h:outputText value="#{p.respmin}" style="align-items: center"/></div>
+                            </p:column>
+                            <p:column headerText="Average" width="10%" style="center" sortBy="#{p.respavg}">
+                                <div align="center"><h:outputText value="#{p.respavg}" style="center"/></div>
+                            </p:column>
+                            <p:column headerText="Maximum" width="10%" sortBy="#{p.respmax}">
+                                <div align="center"><h:outputText value="#{p.respmax}" /></div>
+                            </p:column>
+                            <p:column headerText="Std. Deviation" width="10%" sortBy="#{p.respstd}">
+                                <div align="center"><h:outputText value="#{p.respstd}" /></div>
+                            </p:column>
+                            <p:column headerText="90 Percentile" width="10%" sortBy="#{p.respninp}">
+                                <div align="center"><h:outputText value="#{p.respninp}" /></div>
+                            </p:column>
+                            <p:column headerText="Volume" width="10%" sortBy="#{p.resppass}">
+                                <div align="center"><h:outputText value="#{p.resppass}" /></div>
+                            </p:column>
+                        </p:dataTable>
+                    </p:panel>
+                </center>
+            </p:tab>
+
+        </p:accordionPanel>
+
+        <p:dialog widgetVar="statusDialog" modal="true" draggable="false" closable="false" resizable="false" showHeader="false"  >
+            <p:graphicImage value="/images/ajaxloadingbar.gif"  />
+        </p:dialog>
+
+        <p:ajaxExceptionHandler type="javax.faces.application.ViewExpiredException" onexception="alert('Page Expired, Reloading...!'); location.reload(true);" />
+    </h:body>
+
+</html>
+

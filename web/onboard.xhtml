@@ -1,0 +1,242 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+    <h:head>
+        <title>On-boarding Page</title>
+        <link rel="icon" href="/images/s55.png" type="image/x-icon"/>
+        <p:ajaxExceptionHandler type="javax.faces.application.ViewExpiredException" onexception="alert('Page Expired, Reloading...!'); location.reload(true);" />
+    </h:head>
+    <h:body>
+
+        <p:accordionPanel id="myaccord" style="width:100%; border:1px;" activeIndex="#{onboardingControllerBean.selectedAccordian}">
+
+            <p:tab id="tabonbaording" title="Scenario On-Boarding Form" closable="true" rendered="true" >
+                <center>
+                    <p:panel id="onboardingpanel" header="Scenario On-Boarding Form" style="margin-bottom:10px;width: 60%;height: 50%" >
+                        <h:form id="onboardingform">
+                            <h:panelGrid  columns="5" cellpadding="2"  >
+
+                                <p:outputLabel for="selectapplication" value="Application : "/>
+                                <p:selectOneMenu id="selectapplication" style="width: 80%;width:150px;" value="#{onboardingControllerBean.selectedApplication}" >    
+                                    <f:selectItem  itemLabel="Select" noSelectionOption="true"/>   
+                                    <f:selectItems value="#{onboardingControllerBean.applicationList}" />
+                                    <p:ajax listener="#{onboardingControllerBean.updateSelectedApplication}" onstart="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()"/>
+                                </p:selectOneMenu>
+                                <p:watermark for="newapplication" value="Add Application Name" />
+                                <p:inputText id="newapplication" value="#{onboardingControllerBean.newapplication}" maxlength="50"  style="text-transform:uppercase;" widgetVar="newapplication" autocomplete="off">
+                                    <p:ajax listener="#{onboardingControllerBean.updateNewApplicationText}" onstart="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()"/>
+                                </p:inputText>
+                                <p:commandLink id="saveapplicationbtn" type="button" rendered="true"  title="Click to add application to list" disabled="false" async="true" >
+                                    <p:ajax listener="#{onboardingControllerBean.createNewApplication}" update="onboardingform" onstart="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" />
+                                    <p:graphicImage value="/images/save.png" style="width: 90%; height: 90%"/>
+                                </p:commandLink>                       
+                                <p:outputLabel for="selecttesttype" value="Test Type : " />
+                                <p:selectOneMenu id="selecttesttype" style="width: 80%;width:150px;" value="#{onboardingControllerBean.selectedTestType}">  
+                                    <f:selectItem  itemLabel="Select" noSelectionOption="true"/>          
+                                    <f:selectItems value="#{onboardingControllerBean.testTypesList}"/>  
+                                    <p:ajax listener="#{onboardingControllerBean.updateSelectedTestType}" onstart="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()"/>
+                                </p:selectOneMenu>
+                                <p:watermark for="testtype" value="Add Test Type"   />
+                                <p:inputText id="testtype" value="#{onboardingControllerBean.newTestType}" maxlength="15" style="text-transform:uppercase;" autocomplete="off">
+                                    <p:ajax listener="#{onboardingControllerBean.updateNewTestTypeText()}" onstart="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()"/>
+                                </p:inputText>
+                                <p:commandLink id="savetesttypebtn" type="button" rendered="true"  title="Click to add application to list" disabled="false" async="true" >
+                                    <p:ajax listener="#{onboardingControllerBean.createNewTestType}" update="onboardingform "  onstart="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()"/>
+                                    <p:graphicImage value="/images/save.png" style="width: 90%; height: 90%"/>
+                                </p:commandLink>  
+
+                                <p:outputLabel for="scenarioname" value="Scenario Name : "/>
+                                <p:inputText id="scenarioname" value="#{onboardingControllerBean.scenarioName}" style="text-transform:uppercase;" maxlength="100" autocomplete="off" >
+                                    <p:watermark for="scenarioname" value="Scenario Name" />
+                                    <p:ajax listener="#{onboardingControllerBean.updateScenarioName}" update="scenarioname" />
+                                </p:inputText>
+                                <h:outputText/>
+                                <h:outputText/>
+                                <h:outputText/>
+                                <p:outputLabel for="scenariodescription" value="Scenario Description : "/>
+                                <p:inputText id="scenariodescription" value="#{onboardingControllerBean.scenarioDescription}" maxlength="200" autocomplete="off">                            
+                                    <p:ajax listener="#{onboardingControllerBean.updateScenarioDesc}"/>
+                                </p:inputText>
+                                <p:watermark for="scenariodescription" value="Add Description Here" />
+                                <h:outputText/>
+                                <h:outputText/>
+
+                                <p:outputLabel for="baselinepage" value="Baseline Confluence Link : "/>
+                                <p:inputText id="baselinepage" value="#{onboardingControllerBean.baselinePage}" maxlength="200" autocomplete="off">
+                                    <p:ajax listener="#{onboardingControllerBean.updateConfluenceLink}"/>
+                                </p:inputText>
+                                <p:watermark for="baselinepage" value="Baseline Confluence Link" />
+                                <h:outputText/>
+                                <h:outputText/>
+
+                                <p:outputLabel for="confluenceid" value="Confluence ID : "/>
+                                <p:inputText id="confluenceid" value="#{onboardingControllerBean.confluenceid}" maxlength="200" autocomplete="off" onkeyup="$(this).val($(this).val().replace(/[^0-9]/g, ''));">  
+                                    <p:ajax listener="#{onboardingControllerBean.updateConfluenceID}"/>
+                                </p:inputText>
+                                <p:watermark id="confluenceidwm" for="confluenceid" value="Confluence Page ID " />
+                                <h:outputText/>                        
+                                <p:commandLink id="createconfluencepagebtn" type="button" rendered="true"  title="Click to add application to list" disabled="false" async="true" >
+                                    <p:ajax listener="#{onboardingControllerBean.createNewConfluencePage}" update="onboardingform" onstart="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()"/>
+                                    <p:graphicImage value="/images/create.png" style="width: 90%; height: 90%"/>
+                                </p:commandLink>  
+
+                                <p:outputLabel for="pctestid" value="PC Scenario Details : "/>
+                                <p:inputText id="pctestid" value="#{onboardingControllerBean.pctestid}" maxlength="10" onkeyup="$(this).val($(this).val().replace(/[^0-9]/g, ''));" autocomplete="off">
+                                    <p:ajax listener="#{onboardingControllerBean.updatepcTestId}"/>
+                                </p:inputText>
+                                <p:watermark for="pctestid" value="Test ID " />
+                                <p:inputText id="pcinstanceid" value="#{onboardingControllerBean.pcinstanceid}" maxlength="10" onkeyup="$(this).val($(this).val().replace(/[^0-9]/g, ''));" autocomplete="off">
+                                    <p:ajax listener="#{onboardingControllerBean.updatepcInstanceId}"/>
+                                </p:inputText>
+                                <p:watermark for="pcinstanceid" value="Instance ID" />
+                                <p:outputLabel for="testauthkey" value="Test Authentication Key : "/>
+                                <p:inputText id="testauthkey" value="#{onboardingControllerBean.testAuthKey}" autocomplete="off">                    
+                                    <p:ajax listener="#{onboardingControllerBean.updateAuthKey}"/>
+                                </p:inputText>
+                                <p:watermark for="testauthkey" value="Test Authentication Key " />
+                                <h:outputText/>
+                                <p:watermark for="avgtestduration" value="Avg. Test Duration(HH:MM)" />                        
+                                <p:outputLabel for="avgtestduration" value="Additional Details : "/>
+                                <p:inputText id="avgtestduration" value="#{onboardingControllerBean.avgtestduration}" autocomplete="off" >                    
+                                    <p:ajax listener="#{onboardingControllerBean.updateAvgtestduration}"/>
+                                </p:inputText>
+                                <p:watermark for="concurrentusers" value="Concurrent Users" />                        
+                                <p:inputText id="concurrentusers" value="#{onboardingControllerBean.concurrentusers}" autocomplete="off" onkeyup="$(this).val($(this).val().replace(/[^0-9]/g, ''));">                    
+                                    <p:ajax listener="#{onboardingControllerBean.updateconcurrentusers}"/>
+                                </p:inputText>
+
+                            </h:panelGrid>
+
+                            <br/>   
+                            <br/>
+                            <h:panelGrid  columns="4" cellpadding="5"  >
+                                <p:commandLink id="saveonboardingappbtn" type="button" rendered="true"  title="Click to add application to list" disabled="false" >
+                                    <p:ajax listener="#{onboardingControllerBean.submitNewTest}" update="myaccord" onstart="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide();" async="false"/>
+                                    <p:graphicImage value="/images/createtest.png" style="width: 90%; height: 100%"/>
+                                </p:commandLink>  
+                                <h:outputText/>
+                                <h:outputText value="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"/>
+                                <p:commandLink id="resetform" type="reset" rendered="true"  title="Click to Start the seleted test" disabled="false" async="true" >
+                                    <p:graphicImage value="/images/reset.png" style="width: 100%; height: 100%" />
+                                    <p:ajax update="onboardingform" resetValues="true" onstart="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" oncomplete="location.reload();"/>                             
+                                </p:commandLink>
+                            </h:panelGrid>
+                            <p:growl id="confirmmessage" showDetail="true" life="4000" >
+                                <p:autoUpdate />
+                            </p:growl>
+
+                            <p:dialog widgetVar="onboardsuccessdialog" modal="true" draggable="true" closable="true" resizable="false" showHeader="true" header="Successful" >                
+                                <h:outputText value="Scenario information has been updated, Please set baseline details!" />
+                                <br/>
+                                <br/>
+                                <br/>
+                                <p:commandButton value="&nbsp;&nbsp;OK&nbsp;&nbsp;" >
+                                    <p:ajax listener="#{onboardingControllerBean.showUploadBaselineAccord}" oncomplete="PF('onboardsuccessdialog').hide();location.reload(); " update="myaccord" onstart="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()"/>                                         
+                                </p:commandButton>
+
+                            </p:dialog>
+                            <p:dialog widgetVar="inputallfields" modal="true" draggable="true" closable="true" resizable="false" showHeader="true" header="All Fields Required" >                
+                                <h:outputText value="Please input all fields!" />
+                                <br/>
+                                <br/>
+                                <br/>
+                                <p:commandButton value="&nbsp;&nbsp;OK&nbsp;&nbsp;" oncomplete="PF('inputallfields').hide(); "/>                                   
+                            </p:dialog>                            
+                            <p:dialog widgetVar="exisitingscenarioerror" modal="true" draggable="true" closable="true" resizable="false" showHeader="true" header="Scenario Already Exisits" >                
+                                <h:outputText value="Scenario already exists for selected application and test type!" />
+                                <br/>
+                                <br/>
+                                <br/>
+                                <p:commandButton value="&nbsp;&nbsp;OK&nbsp;&nbsp;" oncomplete="PF('exisitingscenarioerror').hide(); "/>                                   
+                            </p:dialog>
+                        </h:form>
+                    </p:panel>
+                </center>
+            </p:tab>
+            <p:tab id="uploadbaselines" title="Submit Baselines Form" closable="true" rendered="true" >
+                <center>
+                    <h:form id="baselineuploadform">
+                        <p:panel id="submitbaselinepanel" header="Submit Baseline Results" style="margin-bottom:10px;width: 60%;height: 50%" >
+                            <h:panelGrid  columns="2" cellpadding="0" cellspacing="5" >
+                                <p:outputLabel for="selectedapplicationupload" value="Application : "/>
+                                <p:selectOneMenu id="selectedapplicationupload" style="width: 80%;width:150px;" value="#{onboardingControllerBean.selectedapplicationupload}" >    
+                                    <f:selectItem  itemLabel="Select" noSelectionOption="true"/>   
+                                    <f:selectItems value="#{onboardingControllerBean.applicationlistupload}"/>
+                                    <p:ajax listener="#{onboardingControllerBean.updateSelectedApplicationupload}" update="selectedtesttypeupload" onstart="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()"/>
+                                </p:selectOneMenu>
+                                <p:outputLabel for="selectedtesttypeupload" value="Test Type : "/>
+                                <p:selectOneMenu id="selectedtesttypeupload" style="width: 80%;width:150px;" value="#{onboardingControllerBean.selectedtesttypeupload}" >    
+                                    <f:selectItem  itemLabel="Select" noSelectionOption="true"/>   
+                                    <f:selectItems value="#{onboardingControllerBean.testtypelistupload}"/>
+                                    <p:ajax listener="#{onboardingControllerBean.updateSelectedtesttypeupload}" update="selectedscenarioupload" onstart="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()"/>
+                                </p:selectOneMenu>
+                                <p:outputLabel for="selectedscenarioupload" value="Scenario : "/>
+                                <p:selectOneMenu id="selectedscenarioupload" style="width: 80%;width:150px;" value="#{onboardingControllerBean.selectedscenarioupload}" >    
+                                    <f:selectItem  itemLabel="Select" noSelectionOption="true"/>   
+                                    <f:selectItems value="#{onboardingControllerBean.scenariolistupload}"/>
+                                    <p:ajax listener="#{onboardingControllerBean.updateSelectedscenarioupload}"/>
+                                </p:selectOneMenu>
+                                <p:outputLabel for="shortdescriptionupload" value="Short Description : "/>
+                                <p:inputText id="shortdescriptionupload" value="#{onboardingControllerBean.shortdescriptionupload}" maxlength="50" size="30" title="A simple name to identify the test details by the user while Comparing E.g : Q12018">
+                                    <p:ajax listener="#{onboardingControllerBean.updateShortDescription}"/>
+                                </p:inputText>
+
+
+                                <p:outputLabel for="summaryfile" value="Test Summary File : "/>
+                                <p:fileUpload id="summaryfile" value="#{onboardingControllerBean.summaryFile}" allowTypes="/(\.|\/)(mdb|html)$/"  fileUploadListener="#{onboardingControllerBean.handleFileUpload}" update="selectedFilename" >
+                                    <p:watermark for="summaryfile" value="Select Summary File" />
+                                </p:fileUpload>
+                                <h:outputText/>
+                                <p:inputText id="selectedFilename" value="#{onboardingControllerBean.selectedFilename}" disabled="true" rendered="false"/>
+                                <p:watermark for="shortdescriptionupload" value="e.g : Q12018" />
+                            </h:panelGrid>
+                            <br/>
+                            <br/>
+                            <h:panelGrid columns="4">
+                                <p:commandLink id="saveonboardingappbtn" type="button" rendered="true"  title="Click to add application to list" disabled="false" >
+                                    <p:ajax listener="#{onboardingControllerBean.createBasline}" update="baselineuploadform" onstart="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" />
+                                    <p:graphicImage value="/images/submit.png" style="width: 100%; height: 100%"/>
+                                </p:commandLink>  
+                                <h:outputText value="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"/>
+                                <p:commandLink id="resetform" type="reset" rendered="true"  title="Click to Start the seleted test" disabled="false" async="true" >
+                                    <p:ajax listener="#{onboardingControllerBean.resetBaselineUploadForm}" update="baselineuploadform" onstart="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" oncomplete="location.reload();"/>
+                                    <p:graphicImage value="/images/reset.png" style="width: 100%; height: 100%"  />
+                                </p:commandLink>
+                                <h:outputText value="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"/>
+                            </h:panelGrid>
+                        </p:panel>
+                        <p:growl id="confirmmessage" showDetail="true" life="4000">
+                            <p:autoUpdate />
+                        </p:growl>  
+                        <p:dialog widgetVar="inputallfieldsupload" modal="true" draggable="true" closable="true" resizable="false" showHeader="true" header="All Fields Required" >                
+                            <h:outputText value="Please input all fields!" />
+                            <br/>
+                            <br/>
+                            <br/>
+                            <p:commandButton value="&nbsp;&nbsp;OK&nbsp;&nbsp;" oncomplete="PF('inputallfieldsupload').hide(); "/>                                   
+                        </p:dialog>
+                        <p:dialog widgetVar="uploadresultssuccess" modal="true" draggable="true" closable="true" resizable="false" showHeader="true" header="Upload Status" >                
+
+                            <br/>
+                            <h:outputText value="Baseline Results uploaded Successfully!"/>
+                            <br/>
+                            <br/>
+                            <p:commandButton value="&nbsp;&nbsp;OK&nbsp;&nbsp;" oncomplete="PF('uploadresultssuccess').hide();location.reload();"/>                                   
+                        </p:dialog>
+                    </h:form>
+                </center>
+            </p:tab>
+        </p:accordionPanel>
+        <p:dialog widgetVar="statusDialog" modal="true" draggable="false" closable="false" resizable="false" showHeader="false"  >
+            <p:graphicImage value="/images/ajaxloadingbar.gif"  />
+        </p:dialog>
+        <p:ajaxExceptionHandler type="javax.faces.application.ViewExpiredException" onexception="alert('Page Expired, Reloading...!'); location.reload(true);" />
+    </h:body>
+    <footer>
+
+    </footer>
+</html>
+

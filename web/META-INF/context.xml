@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Context path="/loadtest2.0">
+    <!--
+<Resource name="jdbc/testondemand"
+    global="jdbc/testondemand"
+    factory="org.apache.tomcat.jdbc.pool.DataSourceFactory"
+    auth="Container"
+    type="javax.sql.DataSource"
+    username="admin"
+    password="admin"
+    driverClassName="org.apache.derby.jdbc.ClientDriver"
+    description="JCG Example Derby database."
+    url="jdbc:derby://localhost:1527/testondemand"
+    maxTotal="10"
+    maxIdle="10"
+    maxWaitMillis="10000"
+    removeAbandonedTimeout="300"
+    defaultAutoCommit="true"/>
+    -->
+</Context>
